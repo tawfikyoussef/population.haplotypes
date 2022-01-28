@@ -2,7 +2,7 @@
 % Please edit documentation in R/Populations_hap.R
 \name{calculate_haplotypic_differences}
 \alias{calculate_haplotypic_differences}
-\title{Calculate Haplotypes Differences between population}
+\title{Calculate Haplotypes Differences between Population}
 \usage{
 calculate_haplotypic_differences(filename)
 }
