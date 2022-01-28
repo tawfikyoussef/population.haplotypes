@@ -1,6 +1,6 @@
 #' Calculate Haplotypes Differences between population
 #'
-#' @export create_haplo_pop_dataset
+#' @export calculate_haplotypic_differences
 #' @param filename .arp file intended to be used for the analysis
 #'
 #' @examples create_haplo_pop_dataset("example.arp")
@@ -15,10 +15,7 @@
 #Haplo to data frame
 #Read the file by line
 
-create_haplo_pop_dataset <- function(filename){
-  if(!require(reshape2)){
-    stop("reshape2 not installed")
-  } else {
+calculate_haplotypic_differences <- function(filename){
 
     ##create vector with all the line in the file
     vec1 <- readLines(filename)
@@ -48,9 +45,6 @@ create_haplo_pop_dataset <- function(filename){
     haplo_dataset <- cbind(colsplit(haplo_dataset$Haplotype, pattern = "  ",names = c("ID", " Haplotype")))
     haplo_dataset$ID <- formatC(haplo_dataset$ID,width=4,format="d", flag=0)
     haplo_dataset$ID <- as.factor(haplo_dataset$ID)
-    #save as csv in the workspace
-    #Header: ID,Haplotype
-    # sperator: ","
 
     # to save the output dataframe in R, use the <<- to assign it to a dataframe, so we save the haplotypes dataset
     haplotypes <- haplo_dataset
@@ -63,8 +57,6 @@ create_haplo_pop_dataset <- function(filename){
     pop_dataset <- df1[df1$vec3 == 2,]
 
 
-    #groupname_dataset <- df1[df1$vec3==3,]
-    #View(groupname_dataset)
 
     #Group_name vectore that will be used to have the abreviation
     group_name <- pop_dataset$vec1[startsWith(pop_dataset$vec1, "#\t")]
@@ -195,7 +187,7 @@ create_haplo_pop_dataset <- function(filename){
 
     # to save the output dataframe in R, use the <<- to assign it to a dataframe, so we save the whole dataset
     final_dataset <- final_dataset_test
-  }
+
 
   countdifferences <- function(haplotypes){
     difference <- data.frame(matrix(0,nrow(haplotypes),nrow(haplotypes)))
@@ -229,33 +221,34 @@ create_haplo_pop_dataset <- function(filename){
   pop1 <- as.data.frame(str_split_fixed(combiunique$Var1, "_",n=4))
   pop2 <- as.data.frame(str_split_fixed(combiunique$Var2, "_", n=4))
 
-  popcomp <<- data.frame(matrix(0,nrow(pop1),3))
-  popcomp[pop1[,2] != pop2[,2],1] <<- ("Different_populations")
-  popcomp[pop1[,2] == pop2[,2],1] <<- pop1[pop1[,2] == pop2[,2],2]
-  popcomp[pop1[,3] != pop2[,3],2] <<- ("Different_regions")
-  popcomp[pop1[,3] == pop2[,3],2] <<- pop1[pop1[,3] == pop2[,3],3]
-  colnames(popcomp) <<- c("popnames", "regionnames", "haplotypes") #sso that the names of the columns are the same as the ref of the haplotypes
+  popcomp <- data.frame(matrix(0,nrow(pop1),3))
+  popcomp[pop1[,2] != pop2[,2],1] <- ("Different_populations")
+  popcomp[pop1[,2] == pop2[,2],1] <- pop1[pop1[,2] == pop2[,2],2]
+  popcomp[pop1[,3] != pop2[,3],2] <- ("Different_regions")
+  popcomp[pop1[,3] == pop2[,3],2] <- pop1[pop1[,3] == pop2[,3],3]
+  colnames(popcomp) <- c("popnames", "regionnames", "haplotypes") #sso that the names of the columns are the same as the ref of the haplotypes
 
   popdiff <- function(i){
     HaploDiff[pop1[i,4],pop2[i,4]] #haplotypes differences taken from the matrix created using the function "countdifferences"
   }
-  popcomp$haplotypes <<- lapply(c(1:nrow(popcomp)), popdiff)
+  popcomp$haplotypes <- lapply(c(1:nrow(popcomp)), popdiff)
 
   # change the population and region names into factors, and unlist the haplotypes column
-  popcomp$haplotypes <<- unlist(popcomp$haplotypes)
-  popcomp$popnames <<- as.factor(popcomp$popnames)
-  popcomp$regionnames <<- as.factor(popcomp$regionnames)
+  popcomp$haplotypes <- unlist(popcomp$haplotypes)
+  popcomp$popnames <- as.factor(popcomp$popnames)
+  popcomp$regionnames <- as.factor(popcomp$regionnames)
+  haplotypic_differences_df <<- popcomp
 
   # make model using lm(), print summary, then save it as a txt file
-  m_pop_reg <<- lm(data=popcomp, haplotypes ~ popnames + regionnames)
+  linear_model <<- lm(data=popcomp, haplotypes ~ popnames + regionnames)
   sink("linear-model_summary.txt")
-  print(summary(m_pop_reg))
+  print(summary(linear_model))
   sink()
-  print(summary(m_pop_reg))
+  print(summary(linear_model))
 
   # make autoplot for model and save it in current directory
   png(filename = "model_diagnostic_plots.png", width = 1000, height = 719)
-  autoplot <- autoplot(m_pop_reg, which = 1:6)
+  autoplot <- autoplot(linear_model, which = 1:6)
   print(autoplot)
   dev.off()
 
