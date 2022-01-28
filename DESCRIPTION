@@ -1,0 +1,16 @@
+Package: Population.Haplotypes
+Type: Package
+Title: Anlysing Whether Different populations have Significantly Different Haplotypes
+Version: 0.1.0
+Author: Natacha Reich, Youssef Tawfik, Jikaël Ntoko, Shobana Singaravelu
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: This package builds a model to test if populations and regions can explain the differences in haplotypes sequences between individuals. You need to provide a .arp file with subject from different regions and their haplotypes sequence
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+Imports: 
+    ggfortify,
+    ggplot2,
+    reshape2,
+    stringr
