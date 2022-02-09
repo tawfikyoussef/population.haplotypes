@@ -1,4 +1,4 @@
-Package: Population.Haplotypes
+Package: PopulationHaplotypes
 Type: Package
 Title: Anlysing Whether Different populations have Significantly Different Haplotypes
 Version: 0.1.0
